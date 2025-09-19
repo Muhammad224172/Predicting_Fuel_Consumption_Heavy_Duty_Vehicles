@@ -1,23 +1,34 @@
-# Graduation-Project-2024
-This is my final year graduation roject on the topic "Predicting Fuel Consumption in Heavy duty Vehicles"
-PROBLEM STATEMENT
-Heavy-duty trucks are responsible for a significant portion of fuel consumption in the transportation industry. This high consumption results in increased operational costs and environmental impact. Efficient fuel consumption modeling is vital for optimizing truck route planning and reducing costs. Our project aimed to develop accurate predictive models for fuel consumption in heavy-duty trucks using machine learning techniques, specifically focusing on feature subset selection methods.
+# Graduation Project 2024  
+**Predicting Fuel Consumption in Heavy-Duty Vehicles**
 
-Previous studies in the literature have explored various machine learning models and feature selection techniques for fuel consumption prediction. However, many existing models lack generalization due to insufficient data preprocessing, overfitting, or inadequate feature selection strategies. Our goal was to build a robust predictive model that would address these issues, providing reliable predictions.
+## Problem Statement
+Heavy-duty trucks account for a significant share of fuel consumption in the transportation industry. This high usage leads to increased operational costs and greater environmental impact. Efficient modeling of fuel consumption is therefore essential for optimizing truck route planning and reducing costs.  
 
-List of features in dataset used
-EngSpeed ,
-ActualEngPercentTorque ,
-EngTotalFuelUsed ,
-TachographVehicleSpeed , 
-AccelPedalPos1 , 
-BrakePedalPos , 
-EngOilTemp1 ,
-EngCoolantTemp ,
-GrossCombinationVehicleWeight ,
-HghRslutionTotalVehicleDistance ,
-DStgy_dmRdcAgAct ,
-PCCM_Slope ,
+This project develops accurate machine-learning models to predict fuel consumption in heavy-duty trucks, with a particular focus on **feature subset selection**.  
 
-# methodology
-Two comparative machine learning model were used namely: XGboost and Random forest using 10-fold cross validation.
+Previous studies have explored various machine-learning models and feature-selection techniques for fuel-consumption prediction. However, many of these models lack generalization due to issues such as inadequate data preprocessing, overfitting, or sub-optimal feature selection.  
+Our goal is to build a **robust and reliable predictive model** that addresses these issues and delivers consistent performance.
+
+## Dataset Features
+The dataset includes the following key features:
+
+- `EngSpeed`
+- `ActualEngPercentTorque`
+- `EngTotalFuelUsed`
+- `TachographVehicleSpeed`
+- `AccelPedalPos1`
+- `BrakePedalPos`
+- `EngOilTemp1`
+- `EngCoolantTemp`
+- `GrossCombinationVehicleWeight`
+- `HghRslutionTotalVehicleDistance`
+- `DStgy_dmRdcAgAct`
+- `PCCM_Slope`
+
+## Methodology
+Two machine-learning models were compared:
+
+- **XGBoost**
+- **Random Forest**
+
+A **10-fold cross-validation** strategy was applied to evaluate model performance and ensure robust, unbiased results.
