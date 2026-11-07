@@ -1,0 +1,31 @@
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "fuelcons"
+version = "1.0.0"
+description = "Window-level fuel-consumption models for heavy-duty trucks (ENS 492 graduation project, refactored)"
+readme = "README.md"
+license = { file = "LICENSE" }
+requires-python = ">=3.10"
+dependencies = ["numpy", "pandas", "scikit-learn>=1.6", "xgboost", "matplotlib", "pyyaml"]
+
+[project.scripts]
+fuelcons = "fuelcons.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+pythonpath = ["src", "tests"]
+testpaths = ["tests"]
+
+[tool.ruff]
+line-length = 120
+target-version = "py310"
+# The archived Colab notebook is a provenance record and must stay byte-identical.
+extend-exclude = ["archive"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP"]
