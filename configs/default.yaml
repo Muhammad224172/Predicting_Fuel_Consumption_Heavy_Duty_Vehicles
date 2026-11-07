@@ -30,6 +30,6 @@ models: [dummy, ridge, random_forest, xgboost]
 
 cv:
   n_splits: 10
-  inner_splits: 5
+  inner_splits: 3            # 5 in the original's tuning step; 3 keeps nested CV affordable
   schemes: [kfold, group_record, group_vehicle]
   tuning: nested

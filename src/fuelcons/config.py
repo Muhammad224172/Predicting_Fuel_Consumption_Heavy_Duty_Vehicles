@@ -52,6 +52,10 @@ class Config:
     models: list[str] = field(default_factory=lambda: ["dummy", "ridge", "random_forest", "xgboost"])
     # Optional overrides of the default hyper-parameter grids in models.py.
     param_grids: dict[str, dict[str, list]] = field(default_factory=dict)
+    # Optional text file listing record ids (one per line) in the order the
+    # windows should be stacked. Only the original protocol depends on row
+    # order (its unshuffled 80% tuning split and the KFold assignment).
+    record_order_file: str | None = None
     cv: CVConfig = field(default_factory=CVConfig)
 
     def to_dict(self) -> dict:

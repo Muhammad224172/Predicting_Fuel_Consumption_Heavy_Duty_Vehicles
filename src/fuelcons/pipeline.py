@@ -22,6 +22,7 @@ from .cleaning import remove_outliers
 from .config import Config
 from .evaluation import cross_validate, scheme_groups, summarise
 from .features import TARGET, build_window_table
+from .io import list_records, record_id
 from .models import make_model
 from .selection import correlation_ranking, feature_columns
 
@@ -29,17 +30,42 @@ log = logging.getLogger("fuelcons")
 
 
 def load_windows(cfg: Config, raw_dir: str | Path, rebuild: bool = False) -> pd.DataFrame:
-    """Window table for the configured window settings, cached as CSV."""
+    """Window table for the configured window settings, cached as CSV.
+
+    The cache is reused only if it was built from the same raw folder and the
+    same set of record files (checked via a small sidecar JSON file).
+    """
     w = cfg.window
     cache = Path(cfg.processed_dir) / f"windows_{w.unit}_{w.size:g}_{w.step:g}.csv"
-    if cache.exists() and not rebuild:
-        log.info("Loading cached window table %s", cache)
-        return pd.read_csv(cache, parse_dates=["start_time", "end_time"])
+    meta_path = cache.with_suffix(".json")
+    meta = {"raw_dir": str(Path(raw_dir).resolve()), "records": [record_id(p) for p in list_records(raw_dir)]}
+    if cache.exists() and meta_path.exists() and not rebuild:
+        if json.loads(meta_path.read_text(encoding="utf-8")) == meta:
+            log.info("Loading cached window table %s", cache)
+            return pd.read_csv(cache, parse_dates=["start_time", "end_time"])
     log.info("Building window table from %s (%s: size=%g, step=%g)", raw_dir, w.unit, w.size, w.step)
     table = build_window_table(raw_dir, w.unit, w.size, w.step)
     cache.parent.mkdir(parents=True, exist_ok=True)
     table.to_csv(cache, index=False)
+    meta_path.write_text(json.dumps(meta), encoding="utf-8")
     return table
+
+
+def read_record_order(path: str | Path) -> list[int]:
+    lines = Path(path).read_text(encoding="utf-8").splitlines()
+    return [int(line) for line in lines if line.strip() and not line.lstrip().startswith("#")]
+
+
+def order_records(table: pd.DataFrame, order: list[int]) -> pd.DataFrame:
+    """Stack records in ``order`` (unlisted records go last, by id)."""
+    rank = table["record_id"].map({rec: i for i, rec in enumerate(order)})
+    key = rank.fillna(len(order) + table["record_id"])
+    return (
+        table.assign(_key=key)
+        .sort_values(["_key", "window_index"], kind="stable")
+        .drop(columns="_key")
+        .reset_index(drop=True)
+    )
 
 
 def run(cfg: Config, raw_dir: str | Path | None = None, rebuild: bool = False) -> Path:
@@ -48,6 +74,8 @@ def run(cfg: Config, raw_dir: str | Path | None = None, rebuild: bool = False) -
     started = datetime.now(timezone.utc)
     t0 = time.perf_counter()
     table = load_windows(cfg, raw_dir or cfg.raw_dir, rebuild)
+    if cfg.record_order_file:
+        table = order_records(table, read_record_order(cfg.record_order_file))
     n_windows_before = len(table)
     table, outlier_log = remove_outliers(table, cfg.outliers.columns, cfg.outliers.iqr_k)
     features = feature_columns(cfg.features.set)

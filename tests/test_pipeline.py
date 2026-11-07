@@ -75,3 +75,22 @@ def test_cli_and_shipped_configs(tmp_path, raw_dir):
     cfg_path.write_text(yaml.safe_dump(cfg.to_dict()))
     main(["--config", str(cfg_path), "--n-jobs", "1"])
     assert (tmp_path / "results" / "cli" / "summary.csv").exists()
+
+
+def test_raw_dir_from_environment(tmp_path, raw_dir, monkeypatch):
+    cfg = _config(tmp_path, tmp_path / "does_not_exist", name="env", models=["dummy"])
+    cfg_path = tmp_path / "env.yaml"
+    cfg_path.write_text(yaml.safe_dump(cfg.to_dict()))
+    monkeypatch.setenv("FUELCONS_RAW_DIR", str(raw_dir))
+    main(["--config", str(cfg_path)])
+    assert (tmp_path / "results" / "env" / "summary.csv").exists()
+
+
+def test_record_order(tmp_path):
+    from fuelcons.pipeline import order_records, read_record_order
+
+    path = tmp_path / "order.txt"
+    path.write_text("# comment\n3\n1\n")
+    table = pd.DataFrame({"record_id": [1, 1, 2, 3, 3], "window_index": [0, 1, 0, 0, 1]})
+    out = order_records(table, read_record_order(path))
+    assert list(zip(out["record_id"], out["window_index"], strict=True)) == [(3, 0), (3, 1), (1, 0), (1, 1), (2, 0)]
