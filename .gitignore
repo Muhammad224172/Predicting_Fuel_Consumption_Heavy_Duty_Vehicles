@@ -1,0 +1,32 @@
+# --- Data: private, never committed -------------------------------------------
+# Raw telemetry goes in data/raw/, derived tables in data/processed/.
+data/*
+!data/README.md
+# Folder name used by the original dataset hand-off, if it is unpacked in the repo root.
+ENS 492 - Fuel Consumption Dataset/
+*.xlsx
+
+# --- Results: only small summaries and figures are tracked ----------------------
+results/**/predictions.csv
+results/**/*.parquet
+results/**/*.pkl
+results/**/*.joblib
+
+# --- Python / tooling ---------------------------------------------------------
+__pycache__/
+*.py[cod]
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+.ipynb_checkpoints/
+.venv/
+venv/
+build/
+dist/
+
+# --- OS / editor ----------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/

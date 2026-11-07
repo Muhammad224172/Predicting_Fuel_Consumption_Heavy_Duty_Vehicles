@@ -1,0 +1,9 @@
+# Normalise text files to LF in the repository, regardless of the OS that commits them.
+* text=auto eol=lf
+
+# Binary formats: never touch line endings or attempt textual diffs.
+*.docx binary
+*.pdf  binary
+*.png  binary
+*.jpg  binary
+*.xlsx binary
