@@ -94,6 +94,7 @@ def run(cfg: Config, raw_dir: str | Path | None = None, rebuild: bool = False) -
     """Run every (CV scheme, model) pair in ``cfg`` and write results to
     ``<results_dir>/<cfg.name>/``. Returns that directory."""
     started = datetime.now(timezone.utc)
+    commit = _git_commit()  # at start: the code that actually runs
     t0 = time.perf_counter()
     table, n_windows_before, outlier_log = prepare_table(cfg, raw_dir, rebuild)
     features = feature_columns(cfg.features.set)
@@ -137,10 +138,11 @@ def run(cfg: Config, raw_dir: str | Path | None = None, rebuild: bool = False) -
     preds_df.to_csv(out / "predictions.csv", index=False, float_format="%.6g")
 
     info = {
-        "config": cfg.to_dict(),
+        "config": portable_config(cfg),
+        "raw_dir_used": display_path(raw_dir or cfg.raw_dir),
         "started_utc": started.isoformat(timespec="seconds"),
         "runtime_seconds": round(time.perf_counter() - t0, 1),
-        "git_commit": _git_commit(),
+        "git_commit": commit,
         "versions": {
             "python": platform.python_version(),
             "numpy": np.__version__,
@@ -228,6 +230,27 @@ def _summary_markdown(cfg: Config, summary: pd.DataFrame, info: dict) -> str:
             f"{r.mae_mean:.4f} ± {r.mae_std:.4f} | {r.r2_mean:.4f} ± {r.r2_std:.4f} |"
         )
     return "\n".join(lines) + "\n"
+
+
+REPO_ROOT = Path(__file__).resolve().parents[2]
+
+
+def display_path(path: str | Path) -> str:
+    """Path relative to the repository, or ``<external>/<folder name>`` for
+    folders outside it, so that saved metadata contains no personal paths."""
+    path = Path(path).resolve()
+    try:
+        return path.relative_to(REPO_ROOT).as_posix()
+    except ValueError:
+        return f"<external>/{path.name}"
+
+
+def portable_config(cfg: Config) -> dict:
+    data = cfg.to_dict()
+    for key in ("raw_dir", "processed_dir", "results_dir", "record_order_file"):
+        if data.get(key):
+            data[key] = display_path(data[key])
+    return data
 
 
 def _git_commit() -> str:

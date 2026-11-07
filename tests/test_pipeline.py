@@ -98,3 +98,10 @@ def test_record_order(tmp_path):
     table = pd.DataFrame({"record_id": [1, 1, 2, 3, 3], "window_index": [0, 1, 0, 0, 1]})
     out = order_records(table, read_record_order(path))
     assert list(zip(out["record_id"], out["window_index"], strict=True)) == [(3, 0), (3, 1), (1, 0), (1, 1), (2, 0)]
+
+
+def test_display_path_hides_external_locations(tmp_path):
+    from fuelcons.pipeline import REPO_ROOT, display_path
+
+    assert display_path(REPO_ROOT / "data" / "raw") == "data/raw"
+    assert display_path(tmp_path / "Records") == "<external>/Records"

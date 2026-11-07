@@ -19,16 +19,28 @@ data/
 - File names must match `Record<N>.csv` (N is an integer). Other files in
   `data/raw/` are ignored, so the provider's `Dataset Description.xlsx` can sit
   there too.
-- If the files are somewhere else (for example the original hand-off folder
-  `ENS 492 - Fuel Consumption Dataset/Records/`), either copy them into
-  `data/raw/` or pass the folder on the command line:
-  `python scripts/run_pipeline.py --raw-dir "ENS 492 - Fuel Consumption Dataset/Records"`.
-- The window table is cached in `data/processed/windows_<unit>_<size>_<step>.csv`.
-  Use `--rebuild` after changing the raw files.
+- The files do not have to be copied into the repository. Point the pipeline
+  at any folder that holds them (for example the original hand-off folder
+  `ENS 492 - Fuel Consumption Dataset/Records/`), either on the command line
+  or through an environment variable:
+
+  ```bash
+  python scripts/run_pipeline.py --raw-dir "/path/to/ENS 492 - Fuel Consumption Dataset/Records"
+  FUELCONS_RAW_DIR="/path/to/.../Records" python scripts/run_pipeline.py
+  ```
+
+  Precedence: `--raw-dir`, then `$FUELCONS_RAW_DIR`, then `raw_dir` in the
+  config file (default `data/raw/`).
+- The window table (about 13 MB for the default settings) is cached in
+  `data/processed/windows_<unit>_<size>_<step>.csv`. It is rebuilt
+  automatically when the raw folder or its set of records changes; use
+  `--rebuild` if file contents changed.
 
 ## Dataset at a glance
 
-From the provider's description sheet and a profile of the files:
+Counts and units come from the provider's description sheet
+(`Dataset Description.xlsx`); lengths and sampling come from a profile of the
+459 files:
 
 | | |
 |---|---|
@@ -47,6 +59,8 @@ trip or segment markers inside a file.
 Each CSV has a header row and these 14 columns. Empty cells are written as
 `NaN`. Units are from the provider's description sheet; "masked" means the
 provider rescaled the values, so their physical unit is unknown.
+
+The last column is the share of rows with a value, averaged over records.
 
 | Column | Description | Unit | Rows with a value |
 |---|---|---|---|

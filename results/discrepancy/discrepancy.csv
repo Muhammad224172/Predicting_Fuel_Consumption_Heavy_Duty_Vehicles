@@ -1,0 +1,10 @@
+model,setting,row_order,rmse_mean,mae_mean,r2_mean,rmse_std,mae_std,r2_std
+xgboost,report hyper-parameters (300 trees),notebook,0.552197,0.315067,0.951816,0.0545226,0.0130967,0.00881853
+xgboost,notebook hyper-parameters (700 trees),notebook,0.541735,0.303108,0.953539,0.0586206,0.0127077,0.00933161
+xgboost,notebook hyper-parameters (700 trees),numeric,0.557903,0.302472,0.950536,0.0563476,0.0113487,0.00994042
+random_forest,"report hyper-parameters, seed 0",notebook,0.627915,0.380758,0.938034,0.0427266,0.0153512,0.00719202
+random_forest,"report hyper-parameters, seed 1",notebook,0.623053,0.377819,0.939005,0.041862,0.0151537,0.00682483
+random_forest,"report hyper-parameters, seed 2",notebook,0.62742,0.379769,0.938112,0.044059,0.0161817,0.00745514
+random_forest,"report hyper-parameters, seed 3",notebook,0.63504,0.382848,0.936633,0.0427621,0.0151819,0.00710227
+random_forest,"report hyper-parameters, seed 4",notebook,0.626169,0.380441,0.938391,0.042218,0.0153056,0.00696661
+random_forest,"report hyper-parameters, seed 0",numeric,0.636827,0.383077,0.936057,0.0373688,0.010749,0.00787563
