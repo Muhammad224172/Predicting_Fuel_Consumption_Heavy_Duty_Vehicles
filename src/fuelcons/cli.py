@@ -16,7 +16,7 @@ import os
 from pathlib import Path
 
 from .config import load_config
-from .pipeline import run
+from .pipeline import redraw_figures, run
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 RAW_DIR_ENV = "FUELCONS_RAW_DIR"
@@ -37,6 +37,9 @@ def main(argv: list[str] | None = None) -> None:
         help=f"Folder of Record<N>.csv files. Overrides ${RAW_DIR_ENV} and the config's raw_dir (default data/raw).",
     )
     parser.add_argument("--rebuild", action="store_true", help="Rebuild the cached window table.")
+    parser.add_argument(
+        "--figures-only", action="store_true", help="Redraw figures from saved results instead of re-running CV."
+    )
     parser.add_argument("--n-jobs", type=int, help="Override the config's n_jobs.")
     args = parser.parse_args(argv)
 
@@ -51,7 +54,10 @@ def main(argv: list[str] | None = None) -> None:
         if args.n_jobs is not None:
             cfg.n_jobs = args.n_jobs
         raw_dir = args.raw_dir or os.environ.get(RAW_DIR_ENV) or None
-        run(cfg, raw_dir=raw_dir, rebuild=args.rebuild)
+        if args.figures_only:
+            redraw_figures(cfg, raw_dir=raw_dir)
+        else:
+            run(cfg, raw_dir=raw_dir, rebuild=args.rebuild)
 
 
 if __name__ == "__main__":

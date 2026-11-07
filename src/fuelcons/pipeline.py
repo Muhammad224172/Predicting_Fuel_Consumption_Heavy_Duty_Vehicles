@@ -68,16 +68,34 @@ def order_records(table: pd.DataFrame, order: list[int]) -> pd.DataFrame:
     )
 
 
+def prepare_table(cfg: Config, raw_dir=None, rebuild: bool = False) -> tuple[pd.DataFrame, int, list[dict]]:
+    """Window table in the configured record order, after outlier removal."""
+    table = load_windows(cfg, raw_dir or cfg.raw_dir, rebuild)
+    if cfg.record_order_file:
+        table = order_records(table, read_record_order(cfg.record_order_file))
+    n_before = len(table)
+    table, outlier_log = remove_outliers(table, cfg.outliers.columns, cfg.outliers.iqr_k)
+    return table, n_before, outlier_log
+
+
+def redraw_figures(cfg: Config, raw_dir=None) -> Path:
+    """Regenerate the figures of an earlier run from its saved results."""
+    out = Path(cfg.results_dir) / cfg.name
+    table, _, _ = prepare_table(cfg, raw_dir)
+    X, y = table[feature_columns(cfg.features.set)], table[TARGET]
+    folds = pd.read_csv(out / "folds.csv")
+    preds = pd.read_csv(out / "predictions.csv")
+    (out / "figures").mkdir(parents=True, exist_ok=True)
+    _make_figures(cfg, X, y, folds, preds, out / "figures")
+    return out
+
+
 def run(cfg: Config, raw_dir: str | Path | None = None, rebuild: bool = False) -> Path:
     """Run every (CV scheme, model) pair in ``cfg`` and write results to
     ``<results_dir>/<cfg.name>/``. Returns that directory."""
     started = datetime.now(timezone.utc)
     t0 = time.perf_counter()
-    table = load_windows(cfg, raw_dir or cfg.raw_dir, rebuild)
-    if cfg.record_order_file:
-        table = order_records(table, read_record_order(cfg.record_order_file))
-    n_windows_before = len(table)
-    table, outlier_log = remove_outliers(table, cfg.outliers.columns, cfg.outliers.iqr_k)
+    table, n_windows_before, outlier_log = prepare_table(cfg, raw_dir, rebuild)
     features = feature_columns(cfg.features.set)
     X, y = table[features], table[TARGET]
     log.info("%d windows (%d before outlier removal), %d features", len(table), n_windows_before, len(features))

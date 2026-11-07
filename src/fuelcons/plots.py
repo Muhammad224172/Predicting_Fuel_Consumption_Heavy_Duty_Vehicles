@@ -50,7 +50,14 @@ def _figure(ncols: int, width: float, height: float):
 
 
 def plot_cv_comparison(folds: pd.DataFrame, path: Path, metrics=("rmse", "r2")) -> None:
-    """Per-fold scores (dots) and their mean (bar) for each model and CV scheme."""
+    """Per-fold scores (dots) and their mean (line) for each model and CV scheme.
+
+    The mean predictor is left out: its R² of about 0 would flatten the axes.
+    Its scores are in summary.md.
+    """
+    folds = folds[folds["model"] != "dummy"]
+    if folds.empty:
+        return
     schemes = list(dict.fromkeys(folds["scheme"]))
     models = list(dict.fromkeys(folds["model"]))
     fig, axes = _figure(len(metrics), 5.2 * len(metrics), 4.2)
@@ -114,7 +121,7 @@ def plot_ranking(values: pd.Series, title: str, xlabel: str, path: Path, top: in
     ax.grid(axis="x", color=GRID, linewidth=0.8)
     ax.grid(axis="y", visible=False)
     ax.set_xlabel(xlabel, color=INK_MUTED)
-    ax.set_title(title, color=INK, fontsize=11, loc="left")
+    fig.suptitle(title, color=INK, fontsize=11, x=0.01, ha="left")
     fig.tight_layout()
     fig.savefig(path, dpi=150, facecolor=SURFACE)
     plt.close(fig)

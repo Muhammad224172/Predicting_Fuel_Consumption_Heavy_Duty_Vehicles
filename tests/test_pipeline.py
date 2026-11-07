@@ -8,7 +8,7 @@ import yaml
 
 from fuelcons.cli import main
 from fuelcons.config import config_from_dict, load_config
-from fuelcons.pipeline import run
+from fuelcons.pipeline import redraw_figures, run
 
 TINY_GRIDS = {
     "ridge": {"alpha": [0.1, 10.0]},
@@ -50,6 +50,9 @@ def test_end_to_end(tmp_path, raw_dir):
         assert (out / "figures" / f"{name}.png").stat().st_size > 0
     assert "| group_vehicle | xgboost |" in (out / "summary.md").read_text()
     assert (tmp_path / "processed" / "windows_rows_120_40.csv").exists()  # cached for the next run
+    (out / "figures" / "cv_comparison.png").unlink()
+    redraw_figures(cfg)
+    assert (out / "figures" / "cv_comparison.png").exists()
 
 
 def test_original_protocol_with_correlation_filter(tmp_path, raw_dir):
@@ -84,6 +87,7 @@ def test_raw_dir_from_environment(tmp_path, raw_dir, monkeypatch):
     monkeypatch.setenv("FUELCONS_RAW_DIR", str(raw_dir))
     main(["--config", str(cfg_path)])
     assert (tmp_path / "results" / "env" / "summary.csv").exists()
+    assert not (tmp_path / "results" / "env" / "figures" / "cv_comparison.png").exists()  # baseline only: no plot
 
 
 def test_record_order(tmp_path):
