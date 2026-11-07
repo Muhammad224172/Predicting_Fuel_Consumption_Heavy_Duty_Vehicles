@@ -1,0 +1,37 @@
+# Re-run of the original notebook's final protocol (archive/ENS492_original.ipynb,
+# cells 99-127), kept for comparison with the numbers in the report.
+#
+#   * 600-row windows advanced by 120 rows (~10 min / ~2 min at ~1 Hz)
+#   * the 58 "mean features" (all window statistics except medians)
+#   * hyper-parameters tuned ONCE on the first 80% of windows, then
+#     re-used in a shuffled 10-fold KFold over all windows
+#
+# Known weaknesses (addressed in default.yaml): overlapping windows of the same
+# trip end up in both train and test folds, and the tuning data overlaps the
+# test folds.
+name: original_protocol
+raw_dir: data/raw
+processed_dir: data/processed
+results_dir: results
+seed: 42
+n_jobs: 4
+
+window:
+  unit: rows
+  size: 600
+  step: 120
+
+outliers:
+  iqr_k: 1.5
+  columns: [fuel_per_weight, fuel_per_100km, EngTotalFuelUsed_range]
+
+features:
+  set: original
+  corr_top_k: null
+
+models: [random_forest, xgboost]
+
+cv:
+  n_splits: 10
+  schemes: [kfold]
+  tuning: original
