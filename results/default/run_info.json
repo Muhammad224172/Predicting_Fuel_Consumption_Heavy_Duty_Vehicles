@@ -1,0 +1,81 @@
+{
+  "config": {
+    "name": "default",
+    "raw_dir": "data/raw",
+    "processed_dir": "data/processed",
+    "results_dir": "results",
+    "seed": 42,
+    "n_jobs": 5,
+    "window": {
+      "unit": "rows",
+      "size": 600,
+      "step": 120
+    },
+    "outliers": {
+      "iqr_k": 1.5,
+      "columns": [
+        "fuel_per_weight",
+        "fuel_per_100km",
+        "EngTotalFuelUsed_range"
+      ]
+    },
+    "features": {
+      "set": "original",
+      "corr_top_k": null
+    },
+    "models": [
+      "dummy",
+      "ridge",
+      "random_forest",
+      "xgboost"
+    ],
+    "param_grids": {},
+    "record_order_file": null,
+    "cv": {
+      "n_splits": 10,
+      "inner_splits": 3,
+      "schemes": [
+        "kfold",
+        "group_record",
+        "group_vehicle"
+      ],
+      "tuning": "nested"
+    }
+  },
+  "started_utc": "2026-11-07T17:26:34+00:00",
+  "runtime_seconds": 8508.4,
+  "git_commit": "1dfb7e8",
+  "versions": {
+    "python": "3.11.18",
+    "numpy": "2.4.6",
+    "pandas": "3.1.1",
+    "scikit-learn": "1.9.1",
+    "xgboost": "3.4.2"
+  },
+  "data": {
+    "n_records": 456,
+    "n_vehicles": 187,
+    "n_windows_before_outlier_removal": 10499,
+    "n_windows": 10087,
+    "outlier_removal": [
+      {
+        "column": "fuel_per_weight",
+        "removed": 150,
+        "remaining": 10349
+      },
+      {
+        "column": "fuel_per_100km",
+        "removed": 206,
+        "remaining": 10143
+      },
+      {
+        "column": "EngTotalFuelUsed_range",
+        "removed": 56,
+        "remaining": 10087
+      }
+    ],
+    "n_features": 58,
+    "target_mean": 4.447461114201524,
+    "target_std": 2.5273579312654495
+  }
+}
